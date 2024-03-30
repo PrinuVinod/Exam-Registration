@@ -1,0 +1,23 @@
+project-root/
+│
+├── models/
+│   ├── User.js
+│   └── Cart.js
+│
+├── routes/
+│   ├── login.js
+│   ├── addToCart.js
+│   └── subjectSelection.js
+│
+├── views/
+│   ├── login.ejs
+│   ├── subjectSelection.ejs
+│   └── signup.ejs
+│
+├── public/
+│   └── styles.css
+│
+├── app.js
+├── package.json
+├── .env
+└── .gitignore

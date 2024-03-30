@@ -1,0 +1,18 @@
+Hello,
+
+Hope all are doing well. We are moving forward to the second round of tasks. There are two activities to complete:
+
+Create a Data Flow Diagram (DFD) for an Education Consultancy.
+
+Develop a Website for Exam Registration with Subject Carting and Invoice Generation. 
+For the website, incorporate payment integration. The subjects available for registration should include Cambridge IGCSE, AS, 
+and A Level subjects. Please note that the subjects offered may vary based on the level (IGCSE, AS, A Level).
+
+Should you have any questions or require clarification on any aspect of these tasks, please do not hesitate to reach out.
+
+The last date for submission is on Monday.
+
+Best Regards,
+
+IT Head
+LFTECH Solutions

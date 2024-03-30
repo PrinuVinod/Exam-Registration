@@ -1,0 +1,21 @@
+const User = require('../models/User');
+
+exports.signup = async (req, res) => {
+    const {
+        name,
+        email,
+        password
+    } = req.body;
+
+    try {
+        const newUser = new User({
+            name,
+            email,
+            password
+        });
+        await newUser.save();
+        res.redirect('/login');
+    } catch (error) {
+        res.status(500).send('Failed to register user');
+    }
+};

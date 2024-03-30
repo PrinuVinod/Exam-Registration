@@ -1,0 +1,188 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Subject Selection</title>
+    <style>
+        /* General styles */
+        body {
+            margin: 0;
+            margin-top: 20px;
+            padding: 0;
+        }
+
+        /* Container styles */
+        .container {
+            position: relative;
+            max-width: 600px;
+            margin: 0 auto;
+            padding: 20px;
+            background-color: #f9f9f9;
+            border-radius: 5px;
+            box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
+        }
+
+        /* Styles for the form header */
+        h1 {
+            text-align: center;
+            margin-bottom: 20px;
+            color: #333;
+        }
+
+        /* Styles for subject categories */
+        h3 {
+            font-size: 1.2em;
+            margin-bottom: 10px;
+            color: #555;
+        }
+
+        /* Styles for individual subjects */
+        input[type="checkbox"] {
+            margin-right: 5px;
+        }
+
+        /* Styles for the submit button */
+        button[type="submit"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            margin-top: 20px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #45a049;
+        }
+
+        /* Style for email input */
+        input[type="email"] {
+            width: calc(100% - 22px);
+            /* Subtract padding and border */
+            padding: 10px;
+            margin-bottom: 10px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            font-size: 16px;
+        }
+
+        /* Style for form labels */
+        label {
+            color: #333;
+            margin-bottom: 5px;
+        }
+
+        /* Style for cart button */
+        .cart-button {
+            position: absolute;
+            top: 20px;
+            right: 20px;
+            display: block;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 1em;
+            text-align: center;
+            text-decoration: none;
+        }
+
+        .cart-button:hover {
+            background-color: #0056b3;
+        }
+    </style>
+</head>
+
+<body>
+    <a href="/cart" class="cart-button">Cart</a> <!-- Moved Cart button to the top right corner -->
+    <div class="container">
+        <h1>Select Subjects</h1>
+        <form id="subjectForm" action="/subjectSelection/register" method="post">
+            <!-- Include email input field -->
+            <label for="email">Email:</label>
+            <input type="email" id="email" name="email" required>
+            <br>
+            <!-- IGCSE Subjects -->
+            <h3>IGCSE Subjects:</h3>
+            <% subjects.IGCSE.forEach(subject => { %>
+            <input type="checkbox" name="subjects" value="<%= subject %>">
+            <%= subject %> <br>
+            <% }); %>
+
+            <!-- AS Subjects -->
+            <h3>AS Subjects:</h3>
+            <% subjects.AS.forEach(subject => { %>
+            <input type="checkbox" name="subjects" value="<%= subject %>">
+            <%= subject %> <br>
+            <% }); %>
+
+            <!-- A Level Subjects -->
+            <h3>A Level Subjects:</h3>
+            <% subjects.ALevel.forEach(subject => { %>
+            <input type="checkbox" name="subjects" value="<%= subject %>">
+            <%= subject %> <br>
+            <% }); %>
+            <!-- Add hidden input field to hold email value -->
+            <input type="hidden" id="cartEmail" name="cartEmail">
+            <button type="submit">Submit</button>
+        </form>
+    </div>
+
+    <script>
+        document.getElementById("subjectForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            // Get selected subjects
+            var selectedSubjects = document.querySelectorAll('input[name="subjects"]:checked');
+            var subjectsList = [];
+            selectedSubjects.forEach(function (subject) {
+                subjectsList.push(subject.value);
+            });
+
+            // Get email from the input field
+            var email = document.getElementById("email").value;
+
+            // Set email value to hidden input field
+            document.getElementById("cartEmail").value = email;
+
+            // Create data object to send to server
+            var data = {
+                email: email,
+                subjects: subjectsList
+            };
+
+            // Send data to server using fetch API
+            fetch("/subjectSelection/register", {
+                method: "POST",
+                headers: {
+                    "Content-Type": "application/json"
+                },
+                body: JSON.stringify(data)
+            })
+                .then(response => {
+                    if (response.ok) {
+                        return response.text();
+                    } else {
+                        throw new Error("Failed to register subjects.");
+                    }
+                })
+                .then(responseText => {
+                    alert(responseText); // Show server response in an alert
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("An error occurred. Please try again later.");
+                });
+        });
+    </script>
+</body>
+
+</html>
