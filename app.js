@@ -2,6 +2,8 @@ const express = require('express');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const PDFDocument = require('pdfkit');
+const blobStream = require('blob-stream');
 require('dotenv').config();
 
 const app = express();
@@ -163,6 +165,53 @@ app.get('/search', authenticateUser, async (req, res) => {
     } catch (error) {
         console.error('Error retrieving cart items:', error);
         res.status(500).send('Failed to retrieve cart items');
+    }
+});
+
+app.get('/generateInvoice', async (req, res) => {
+    try {
+        const userEmail = req.query.email;
+        const cart = await Cart.findOne({
+            email: userEmail
+        }).exec();
+        if (!cart) {
+            return res.status(404).send('Cart not found');
+        }
+        res.json(cart.subjects);
+    } catch (error) {
+        console.error('Error generating invoice:', error);
+        res.status(500).send('Failed to generate invoice');
+    }
+});
+
+app.get('/generatePDFInvoice', async (req, res) => {
+    try {
+        const userEmail = req.query.email;
+        const cart = await Cart.findOne({
+            email: userEmail
+        }).exec();
+        if (!cart) {
+            return res.status(404).send('Cart not found');
+        }
+
+        const doc = new PDFDocument();
+
+        res.setHeader('Content-disposition', 'attachment; filename="invoice.pdf"');
+        res.setHeader('Content-type', 'application/pdf');
+
+        doc.pipe(res);
+
+        doc.fontSize(12).text(`Email: ${userEmail}`, 50, 50);
+        doc.moveDown();
+        doc.fontSize(14).text('Subjects:', 50, 100);
+        cart.subjects.forEach((item, index) => {
+            doc.text(`${index + 1}. ${item}`, 60, 130 + index * 20);
+        });
+
+        doc.end();
+    } catch (error) {
+        console.error('Error generating PDF invoice:', error);
+        res.status(500).send('Failed to generate PDF invoice');
     }
 });
 
