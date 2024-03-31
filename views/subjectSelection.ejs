@@ -6,14 +6,12 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Subject Selection</title>
     <style>
-        /* General styles */
         body {
             margin: 0;
             margin-top: 20px;
             padding: 0;
         }
 
-        /* Container styles */
         .container {
             position: relative;
             max-width: 600px;
@@ -24,26 +22,22 @@
             box-shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
         }
 
-        /* Styles for the form header */
         h1 {
             text-align: center;
             margin-bottom: 20px;
             color: #333;
         }
 
-        /* Styles for subject categories */
         h3 {
             font-size: 1.2em;
             margin-bottom: 10px;
             color: #555;
         }
 
-        /* Styles for individual subjects */
         input[type="checkbox"] {
             margin-right: 5px;
         }
 
-        /* Styles for the submit button */
         button[type="submit"] {
             display: block;
             width: 100%;
@@ -61,10 +55,8 @@
             background-color: #45a049;
         }
 
-        /* Style for email input */
         input[type="email"] {
             width: calc(100% - 22px);
-            /* Subtract padding and border */
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #ccc;
@@ -72,13 +64,11 @@
             font-size: 16px;
         }
 
-        /* Style for form labels */
         label {
             color: #333;
             margin-bottom: 5px;
         }
 
-        /* Style for cart button */
         .cart-button {
             position: absolute;
             top: 20px;
@@ -102,13 +92,12 @@
 </head>
 
 <body>
-    <a href="/cart" class="cart-button">Cart</a>
+    <a href="/cart" id="cartButton" class="cart-button">Cart</a>
     <div class="container">
         <h1>Select Subjects</h1>
         <form id="subjectForm" action="/subjectSelection/register" method="post">
-            <!-- Include email input field -->
             <label for="email">Email:</label>
-            <input type="email" id="email" name="email" required>
+            <input type="email" id="email" name="email" readonly>
             <br>
             <!-- IGCSE Subjects -->
             <h3>IGCSE Subjects:</h3>
@@ -130,7 +119,6 @@
             <input type="checkbox" name="subjects" value="<%= subject %>">
             <%= subject %> <br>
             <% }); %>
-            <!-- Add hidden input field to hold email value -->
             <input type="hidden" id="cartEmail" name="cartEmail">
             <button type="submit">Submit</button>
         </form>
@@ -176,6 +164,38 @@
                     console.error("Error:", error);
                     alert("An error occurred. Please try again later.");
                 });
+        });
+
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        };
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var emailFromURL = getUrlParameter('email');
+            document.getElementById("email").value = emailFromURL;
+        });
+
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        };
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var emailFromURL = getUrlParameter('email');
+            document.getElementById("email").value = emailFromURL;
+
+            // Update cart button URL with email parameter
+            var cartButton = document.getElementById("cartButton");
+            var cartURL = "/cart";
+            if (emailFromURL !== '') {
+                cartURL += "?email=" + encodeURIComponent(emailFromURL);
+            }
+            cartButton.href = cartURL;
         });
     </script>
 </body>

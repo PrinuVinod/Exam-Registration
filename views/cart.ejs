@@ -48,12 +48,11 @@
             font-size: 16px;
         }
 
-        button {
+        button[type="print"] {
             display: none;
-            /* Initially hide the button */
             width: 100%;
             padding: 10px;
-            background-color: #007bff;
+            background-color: #4CAF50;
             color: white;
             border: none;
             border-radius: 5px;
@@ -66,7 +65,7 @@
         }
 
         button:hover {
-            background-color: #0056b3;
+            background-color: #4CBF51;
         }
 
         #cartItems {
@@ -89,12 +88,12 @@
     <div class="container">
         <h1>Cart</h1>
         <form id="searchForm">
-            <label for="email">Search by Email:</label>
-            <input type="text" id="email" name="email" placeholder="Enter email...">
+            <label for="email">Entered Email ID</label>
+            <input type="text" id="email" name="email"  readonly>
             <button type="submit">Search</button>
         </form>
         <div id="cartItems"></div>
-        <button id="printInvoice">Print Invoice</button>
+        <button type="print" id="printInvoice">Print Invoice</button>
     </div>
 
     <script>
@@ -117,6 +116,45 @@
 
                     displayCartItems(data);
                     
+                    document.getElementById("printInvoice").style.display = "block";
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("An error occurred. Please try again later.");
+                });
+        });
+
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        };
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var emailFromURL = getUrlParameter('email');
+            document.getElementById("email").value = emailFromURL;
+        });
+
+        document.getElementById("searchForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            var email = document.getElementById("email").value;
+
+            fetch("/search?email=" + encodeURIComponent(email))
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch data from server");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!Array.isArray(data)) {
+                        throw new Error("Invalid data format");
+                    }
+
+                    displayCartItems(data);
+
                     document.getElementById("printInvoice").style.display = "block";
                 })
                 .catch(error => {
