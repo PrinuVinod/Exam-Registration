@@ -2,6 +2,8 @@ const express = require('express');
 const session = require('express-session');
 const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
+const PDFDocument = require('pdfkit');
+const blobStream = require('blob-stream');
 require('dotenv').config();
 
 const app = express();
@@ -94,9 +96,9 @@ app.post('/login', async (req, res) => {
 app.get('/subjectSelection', authenticateUser, (req, res) => {
     const userEmail = req.session.email;
     const subjects = {
-        IGCSE: ['Mathematics', 'Physics', 'Chemistry'],
-        AS: ['Biology', 'Economics', 'Computer Science'],
-        ALevel: ['Literature', 'History', 'Psychology']
+        IGCSE: ['MAT-101: Mathematics', 'PHY-101: Physics', 'CHEM-101: Chemistry'],
+        AS: ['BIO-101: Biology', 'ECO-101: Economics', 'COMP-101: Computer Science'],
+        ALevel: ['LIT-101: Literature', 'HIS-101: History', 'PSY-101: Psychology']
     };
 
     res.render('subjectSelection', {
@@ -120,10 +122,18 @@ app.post('/subjectSelection/register', authenticateUser, async (req, res) => {
                 email,
                 subjects
             });
-        } else {
-            cart.subjects = [...cart.subjects, ...subjects];
+            await cart.save();
+            return res.send('Subjects added to cart successfully');
         }
 
+        const existingSubjects = cart.subjects;
+        const newSubjects = subjects.filter(subject => !existingSubjects.includes(subject));
+
+        if (newSubjects.length === 0) {
+            return res.status(400).send('All subjects already exist in the cart');
+        }
+
+        cart.subjects = [...existingSubjects, ...newSubjects];
         await cart.save();
 
         res.send('Subjects added to cart successfully');
@@ -132,6 +142,7 @@ app.post('/subjectSelection/register', authenticateUser, async (req, res) => {
         res.status(500).send('Failed to add subjects to cart');
     }
 });
+
 
 app.get('/cart', async (req, res) => {
     try {
@@ -155,18 +166,61 @@ app.get('/search', authenticateUser, async (req, res) => {
             email: userEmail
         }).exec();
         if (!cart) {
-            return res.render('cart', {
-                cartItems: []
-            });
+            return res.json([]);
         }
 
         const cartItems = cart.subjects;
-        res.render('cart', {
-            cartItems
-        });
+        res.json(cartItems);
     } catch (error) {
         console.error('Error retrieving cart items:', error);
         res.status(500).send('Failed to retrieve cart items');
+    }
+});
+
+app.get('/generateInvoice', async (req, res) => {
+    try {
+        const userEmail = req.query.email;
+        const cart = await Cart.findOne({
+            email: userEmail
+        }).exec();
+        if (!cart) {
+            return res.status(404).send('Cart not found');
+        }
+        res.json(cart.subjects);
+    } catch (error) {
+        console.error('Error generating invoice:', error);
+        res.status(500).send('Failed to generate invoice');
+    }
+});
+
+app.get('/generatePDFInvoice', async (req, res) => {
+    try {
+        const userEmail = req.query.email;
+        const cart = await Cart.findOne({
+            email: userEmail
+        }).exec();
+        if (!cart) {
+            return res.status(404).send('Cart not found');
+        }
+
+        const doc = new PDFDocument();
+
+        res.setHeader('Content-disposition', 'attachment; filename="invoice.pdf"');
+        res.setHeader('Content-type', 'application/pdf');
+
+        doc.pipe(res);
+
+        doc.fontSize(12).text(`Email: ${userEmail}`, 50, 50);
+        doc.moveDown();
+        doc.fontSize(14).text('Subjects:', 50, 100);
+        cart.subjects.forEach((item, index) => {
+            doc.text(`${index + 1}. ${item}`, 60, 130 + index * 20);
+        });
+
+        doc.end();
+    } catch (error) {
+        console.error('Error generating PDF invoice:', error);
+        res.status(500).send('Failed to generate PDF invoice');
     }
 });
 

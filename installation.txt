@@ -2,3 +2,4 @@ npm install express ejs body-parser
 npm install mongoose dotenv --save
 npm install bcrypt
 npm install express-session
+npm install pdfkit blob-stream

@@ -1,21 +1,19 @@
-project-root/
+Exam-Registration/
 │
 ├── models/
-│   ├── User.js
-│   └── Cart.js
+│   └── User.js
 │
 ├── routes/
-│   ├── login.js
 │   ├── addToCart.js
+│   ├── login.js
+│   ├── signup.js
 │   └── subjectSelection.js
 │
 ├── views/
+│   ├── cart.ejs
 │   ├── login.ejs
 │   ├── subjectSelection.ejs
 │   └── signup.ejs
-│
-├── public/
-│   └── styles.css
 │
 ├── app.js
 ├── package.json

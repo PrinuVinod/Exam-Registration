@@ -1,5 +1,3 @@
-<!-- cart.ejs -->
-
 <!DOCTYPE html>
 <html lang="en">
 
@@ -8,10 +6,15 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Cart</title>
     <style>
-        /* Add your CSS styles here */
+        body {
+            margin: 0;
+            padding: 0;
+            font-family: Arial, sans-serif;
+        }
+
         .container {
             max-width: 600px;
-            margin: 0 auto;
+            margin: 20px auto;
             padding: 20px;
             background-color: #f9f9f9;
             border-radius: 5px;
@@ -24,14 +27,59 @@
             color: #333;
         }
 
-        /* Style for search input */
         input[type="text"] {
-            width: 100%;
+            width: calc(100% - 22px);
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #ccc;
             border-radius: 5px;
             font-size: 16px;
+        }
+
+        button[type="submit"] {
+            display: block;
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button[type="print"] {
+            display: none;
+            width: 100%;
+            padding: 10px;
+            background-color: #4CAF50;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
+        button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        button:hover {
+            background-color: #4CBF51;
+        }
+
+        #cartItems {
+            margin-top: 20px;
+        }
+
+        #cartItems li {
+            list-style: none;
+            padding: 5px 0;
+            border-bottom: 1px solid #ccc;
+        }
+
+        #cartItems li:last-child {
+            border-bottom: none;
         }
     </style>
 </head>
@@ -40,35 +88,115 @@
     <div class="container">
         <h1>Cart</h1>
         <form id="searchForm">
-            <label for="email">Search by Email:</label>
-            <input type="text" id="email" name="email" placeholder="Enter email...">
-            <button type="button" id="searchBtn">Search</button> <!-- Change type to button -->
+            <label for="email">Entered Email ID</label>
+            <input type="text" id="email" name="email"  readonly>
+            <button type="submit">Search</button>
         </form>
-        <div id="cartItems"></div> <!-- This div will display the fetched data -->
+        <div id="cartItems"></div>
+        <button type="print" id="printInvoice">Print Invoice</button>
     </div>
 
     <script>
-        document.getElementById("searchBtn").addEventListener("click", function () {
-            // Get email from the input field
+        document.getElementById("searchForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
             var email = document.getElementById("email").value;
 
-            // Fetch data from server
             fetch("/search?email=" + encodeURIComponent(email))
                 .then(response => {
                     if (!response.ok) {
                         throw new Error("Failed to fetch data from server");
                     }
-                    return response.text();
+                    return response.json();
                 })
                 .then(data => {
-                    // Update DOM with the fetched data
-                    document.getElementById("cartItems").innerHTML = data;
+                    if (!Array.isArray(data)) {
+                        throw new Error("Invalid data format");
+                    }
+
+                    displayCartItems(data);
+                    
+                    document.getElementById("printInvoice").style.display = "block";
                 })
                 .catch(error => {
                     console.error("Error:", error);
                     alert("An error occurred. Please try again later.");
                 });
         });
+
+        function getUrlParameter(name) {
+            name = name.replace(/[\[]/, '\\[').replace(/[\]]/, '\\]');
+            var regex = new RegExp('[\\?&]' + name + '=([^&#]*)');
+            var results = regex.exec(location.search);
+            return results === null ? '' : decodeURIComponent(results[1].replace(/\+/g, ' '));
+        };
+
+        document.addEventListener("DOMContentLoaded", function () {
+            var emailFromURL = getUrlParameter('email');
+            document.getElementById("email").value = emailFromURL;
+        });
+
+        document.getElementById("searchForm").addEventListener("submit", function (event) {
+            event.preventDefault();
+
+            var email = document.getElementById("email").value;
+
+            fetch("/search?email=" + encodeURIComponent(email))
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch data from server");
+                    }
+                    return response.json();
+                })
+                .then(data => {
+                    if (!Array.isArray(data)) {
+                        throw new Error("Invalid data format");
+                    }
+
+                    displayCartItems(data);
+
+                    document.getElementById("printInvoice").style.display = "block";
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("An error occurred. Please try again later.");
+                });
+        });
+
+        document.getElementById("printInvoice").addEventListener("click", function () {
+            var email = document.getElementById("email").value;
+            fetch("/generatePDFInvoice?email=" + encodeURIComponent(email))
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch invoice data from server");
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    var url = window.URL.createObjectURL(blob);
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'invoice.pdf';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("An error occurred while generating the invoice. Please try again later.");
+                });
+        });
+
+        function displayCartItems(items) {
+            var cartItemsDiv = document.getElementById("cartItems");
+            cartItemsDiv.innerHTML = "";
+
+            items.forEach(item => {
+                var listItem = document.createElement("li");
+                listItem.textContent = item;
+                cartItemsDiv.appendChild(listItem);
+            });
+        }
     </script>
 </body>
 
