@@ -155,15 +155,11 @@ app.get('/search', authenticateUser, async (req, res) => {
             email: userEmail
         }).exec();
         if (!cart) {
-            return res.render('cart', {
-                cartItems: []
-            });
+            return res.json([]); // Return an empty array if cart is not found
         }
 
         const cartItems = cart.subjects;
-        res.render('cart', {
-            cartItems
-        });
+        res.json(cartItems); // Send the cart items as JSON
     } catch (error) {
         console.error('Error retrieving cart items:', error);
         res.status(500).send('Failed to retrieve cart items');
