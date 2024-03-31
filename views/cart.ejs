@@ -10,7 +10,7 @@
             margin: 0;
             margin-top: 20px;
         }
-        
+
         .container {
             max-width: 600px;
             margin: 0 auto;
@@ -46,31 +46,27 @@
             <input type="text" id="email" name="email" placeholder="Enter email...">
             <button type="submit">Search</button>
         </form>
-        <div id="cartItems"></div> <!-- This div will display the fetched data -->
+        <div id="cartItems"></div>
     </div>
 
     <script>
         document.getElementById("searchForm").addEventListener("submit", function (event) {
             event.preventDefault();
 
-            // Get email from the input field
             var email = document.getElementById("email").value;
 
-            // Fetch data from server
             fetch("/search?email=" + encodeURIComponent(email))
                 .then(response => {
                     if (!response.ok) {
                         throw new Error("Failed to fetch data from server");
                     }
-                    return response.json(); // Parse response as JSON
+                    return response.json();
                 })
                 .then(data => {
-                    // Check if data is an array
                     if (!Array.isArray(data)) {
                         throw new Error("Invalid data format");
                     }
 
-                    // Display cart items
                     displayCartItems(data);
                 })
                 .catch(error => {
@@ -81,9 +77,8 @@
 
         function displayCartItems(items) {
             var cartItemsDiv = document.getElementById("cartItems");
-            cartItemsDiv.innerHTML = ""; // Clear previous content
+            cartItemsDiv.innerHTML = "";
 
-            // Iterate over cart items array and display each item
             items.forEach(item => {
                 var listItem = document.createElement("li");
                 listItem.textContent = item;

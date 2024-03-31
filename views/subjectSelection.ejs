@@ -102,7 +102,7 @@
 </head>
 
 <body>
-    <a href="/cart" class="cart-button">Cart</a> <!-- Moved Cart button to the top right corner -->
+    <a href="/cart" class="cart-button">Cart</a>
     <div class="container">
         <h1>Select Subjects</h1>
         <form id="subjectForm" action="/subjectSelection/register" method="post">
@@ -140,26 +140,21 @@
         document.getElementById("subjectForm").addEventListener("submit", function (event) {
             event.preventDefault();
 
-            // Get selected subjects
             var selectedSubjects = document.querySelectorAll('input[name="subjects"]:checked');
             var subjectsList = [];
             selectedSubjects.forEach(function (subject) {
                 subjectsList.push(subject.value);
             });
 
-            // Get email from the input field
             var email = document.getElementById("email").value;
 
-            // Set email value to hidden input field
             document.getElementById("cartEmail").value = email;
 
-            // Create data object to send to server
             var data = {
                 email: email,
                 subjects: subjectsList
             };
 
-            // Send data to server using fetch API
             fetch("/subjectSelection/register", {
                 method: "POST",
                 headers: {
@@ -175,7 +170,7 @@
                     }
                 })
                 .then(responseText => {
-                    alert(responseText); // Show server response in an alert
+                    alert(responseText);
                 })
                 .catch(error => {
                     console.error("Error:", error);
