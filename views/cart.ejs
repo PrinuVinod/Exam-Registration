@@ -27,9 +27,8 @@
             color: #333;
         }
 
-        /* Style for search input */
         input[type="text"] {
-            width: calc(100% - 22px); /* Adjusted to accommodate button width */
+            width: calc(100% - 22px);
             padding: 10px;
             margin-bottom: 10px;
             border: 1px solid #ccc;
@@ -49,7 +48,24 @@
             font-size: 16px;
         }
 
+        button {
+            display: none;
+            /* Initially hide the button */
+            width: 100%;
+            padding: 10px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 16px;
+        }
+
         button[type="submit"]:hover {
+            background-color: #0056b3;
+        }
+
+        button:hover {
             background-color: #0056b3;
         }
 
@@ -100,6 +116,8 @@
                     }
 
                     displayCartItems(data);
+                    
+                    document.getElementById("printInvoice").style.display = "block";
                 })
                 .catch(error => {
                     console.error("Error:", error);
@@ -108,28 +126,28 @@
         });
 
         document.getElementById("printInvoice").addEventListener("click", function () {
-                var email = document.getElementById("email").value;
-                fetch("/generatePDFInvoice?email=" + encodeURIComponent(email))
-                    .then(response => {
-                        if (!response.ok) {
-                            throw new Error("Failed to fetch invoice data from server");
-                        }
-                        return response.blob();
-                    })
-                    .then(blob => {
-                        var url = window.URL.createObjectURL(blob);
-                        var a = document.createElement('a');
-                        a.href = url;
-                        a.download = 'invoice.pdf';
-                        document.body.appendChild(a);
-                        a.click();
-                        document.body.removeChild(a);
-                    })
-                    .catch(error => {
-                        console.error("Error:", error);
-                        alert("An error occurred while generating the invoice. Please try again later.");
-                    });
-            });
+            var email = document.getElementById("email").value;
+            fetch("/generatePDFInvoice?email=" + encodeURIComponent(email))
+                .then(response => {
+                    if (!response.ok) {
+                        throw new Error("Failed to fetch invoice data from server");
+                    }
+                    return response.blob();
+                })
+                .then(blob => {
+                    var url = window.URL.createObjectURL(blob);
+                    var a = document.createElement('a');
+                    a.href = url;
+                    a.download = 'invoice.pdf';
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                })
+                .catch(error => {
+                    console.error("Error:", error);
+                    alert("An error occurred while generating the invoice. Please try again later.");
+                });
+        });
 
         function displayCartItems(items) {
             var cartItemsDiv = document.getElementById("cartItems");
