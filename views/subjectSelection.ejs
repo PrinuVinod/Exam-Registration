@@ -96,7 +96,7 @@
     <div class="container">
         <h1>Select Subjects</h1>
         <form id="subjectForm" action="/subjectSelection/register" method="post">
-            <label for="email">Email:</label>
+            <label for="email">Email ID:</label>
             <input type="email" id="email" name="email" readonly>
             <br>
             <!-- IGCSE Subjects -->
@@ -162,7 +162,7 @@
                 })
                 .catch(error => {
                     console.error("Error:", error);
-                    alert("An error occurred. Please try again later.");
+                    alert("Subject already present in Cart.");
                 });
         });
 

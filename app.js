@@ -122,10 +122,18 @@ app.post('/subjectSelection/register', authenticateUser, async (req, res) => {
                 email,
                 subjects
             });
-        } else {
-            cart.subjects = [...cart.subjects, ...subjects];
+            await cart.save();
+            return res.send('Subjects added to cart successfully');
         }
 
+        const existingSubjects = cart.subjects;
+        const newSubjects = subjects.filter(subject => !existingSubjects.includes(subject));
+
+        if (newSubjects.length === 0) {
+            return res.status(400).send('All subjects already exist in the cart');
+        }
+
+        cart.subjects = [...existingSubjects, ...newSubjects];
         await cart.save();
 
         res.send('Subjects added to cart successfully');
@@ -134,6 +142,7 @@ app.post('/subjectSelection/register', authenticateUser, async (req, res) => {
         res.status(500).send('Failed to add subjects to cart');
     }
 });
+
 
 app.get('/cart', async (req, res) => {
     try {
