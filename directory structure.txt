@@ -7,7 +7,6 @@ Exam-Registration/
 │   ├── addToCart.js
 │   ├── login.js
 │   ├── signup.js
-│   └── subjectSelection.js
 │
 ├── views/
 │   ├── cart.ejs
