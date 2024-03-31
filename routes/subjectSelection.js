@@ -4,9 +4,9 @@ const Cart = require('../models/Cart');
 
 router.get('/', (req, res) => {
     const subjects = {
-        IGCSE: ['Mathematics', 'Physics', 'Chemistry'],
-        AS: ['Biology', 'Economics', 'Computer Science'],
-        ALevel: ['Literature', 'History', 'Psychology']
+        IGCSE: ['MAT-101: Mathematics', 'PHY-101: Physics', 'CHEM-101: Chemistry'],
+        AS: ['BIO-101: Biology', 'ECO-101: Economics', 'COMP-101: Computer Science'],
+        ALevel: ['LIT-101: Literature', 'HIS-101: History', 'PSY-101: Psychology']
     };
 
     res.render('subjectSelection', {
