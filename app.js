@@ -4,6 +4,7 @@ const mongoose = require('mongoose');
 const bcrypt = require('bcrypt');
 const PDFDocument = require('pdfkit');
 const blobStream = require('blob-stream');
+const path = require('path');
 require('dotenv').config();
 
 const app = express();
@@ -20,6 +21,8 @@ app.use(session({
     resave: false,
     saveUninitialized: false
 }));
+
+app.use(express.static(path.join(__dirname, 'public')));
 
 mongoose.connect(process.env.MONGODB_URI, {
         useNewUrlParser: true,
